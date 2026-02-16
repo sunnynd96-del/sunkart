@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Form - SunKart Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/admin">🛒 SunKart Admin</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/admin">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/admin/products">Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/orders">Orders</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/">Customer View</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Form Container -->
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0" th:text="${product.id != null ? 'Edit Product' : 'Add New Product'}">Add Product</h4>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{${product.id != null ? '/admin/products/edit/' + product.id : '/admin/products/add'}}" 
+                              th:object="${product}" 
+                              method="post">
+                            
+                            <!-- Product Name -->
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Product Name *</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="name" 
+                                       th:field="*{name}" 
+                                       required
+                                       placeholder="Enter product name">
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" 
+                                          id="description" 
+                                          th:field="*{description}" 
+                                          rows="3"
+                                          placeholder="Enter product description"></textarea>
+                            </div>
+
+                            <!-- Price -->
+                            <div class="mb-3">
+                                <label for="price" class="form-label">Price (₹) *</label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="price" 
+                                       th:field="*{price}" 
+                                       step="0.01"
+                                       min="0"
+                                       required
+                                       placeholder="Enter price">
+                            </div>
+
+                            <!-- Category -->
+                            <div class="mb-3">
+                                <label for="category" class="form-label">Category *</label>
+                                <select class="form-select" id="category" th:field="*{category}" required>
+                                    <option value="">-- Select Category --</option>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Fashion">Fashion</option>
+                                    <option value="Books">Books</option>
+                                    <option value="Home & Kitchen">Home & Kitchen</option>
+                                    <option value="Sports">Sports</option>
+                                    <option value="Beauty">Beauty</option>
+                                    <option value="Toys">Toys</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <!-- Brand -->
+                            <div class="mb-3">
+                                <label for="brand" class="form-label">Brand</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="brand" 
+                                       th:field="*{brand}"
+                                       placeholder="Enter brand name">
+                            </div>
+
+                            <!-- Stock -->
+                            <div class="mb-3">
+                                <label for="stock" class="form-label">Stock Quantity *</label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="stock" 
+                                       th:field="*{stock}" 
+                                       min="0"
+                                       required
+                                       placeholder="Enter stock quantity">
+                            </div>
+
+                            <!-- Image URL -->
+                            <div class="mb-3">
+                                <label for="imageUrl" class="form-label">Image URL</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="imageUrl" 
+                                       th:field="*{imageUrl}"
+                                       placeholder="https://example.com/image.jpg">
+                                <small class="text-muted">Enter image URL or leave blank for placeholder</small>
+                            </div>
+
+                            <!-- Active Status -->
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" 
+                                       class="form-check-input" 
+                                       id="active" 
+                                       th:field="*{active}">
+                                <label class="form-check-label" for="active">
+                                    Product Active (visible to customers)
+                                </label>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="d-flex justify-content-between">
+                                <a href="/admin/products" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-check-circle"></i> Save Product
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Example Images -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h6>💡 Sample Image URLs (Unsplash):</h6>
+                        <ul class="small">
+                            <li>Phone: <code>https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400</code></li>
+                            <li>Laptop: <code>https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400</code></li>
+                            <li>Shoes: <code>https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400</code></li>
+                            <li>Watch: <code>https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400</code></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

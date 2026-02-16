@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Orders - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/admin">🛒 SunKart Admin</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/admin">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/products">Products</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/admin/orders">Orders</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <h2 class="mb-4">Manage Orders</h2>
+
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.id}">#1</td>
+                    <td th:text="${order.user.username}">Customer</td>
+                    <td th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy')}">Date</td>
+                    <td class="fw-bold">₹<span th:text="${order.totalAmount}">0</span></td>
+                    <td>
+                        <form th:action="@{/admin/orders/{id}/status(id=${order.id})}" method="post" class="d-inline">
+                            <select name="status" class="form-select form-select-sm" style="width: auto; display: inline-block;" onchange="this.form.submit()">
+                                <option th:value="PENDING" th:selected="${order.status.name() == 'PENDING'}">Pending</option>
+                                <option th:value="CONFIRMED" th:selected="${order.status.name() == 'CONFIRMED'}">Confirmed</option>
+                                <option th:value="SHIPPED" th:selected="${order.status.name() == 'SHIPPED'}">Shipped</option>
+                                <option th:value="DELIVERED" th:selected="${order.status.name() == 'DELIVERED'}">Delivered</option>
+                                <option th:value="CANCELLED" th:selected="${order.status.name() == 'CANCELLED'}">Cancelled</option>
+                            </select>
+                        </form>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-info" data-bs-toggle="collapse" th:data-bs-target="'#order' + ${order.id}">View Items</button>
+                    </td>
+                </tr>
+                <tr th:id="'order' + ${order.id}" class="collapse" th:each="order : ${orders}">
+                    <td colspan="6">
+                        <div class="p-3 bg-light">
+                            <strong>Order Items:</strong>
+                            <ul>
+                                <li th:each="item : ${order.orderItems}">
+                                    <span th:text="${item.product.name}">Product</span> x 
+                                    <span th:text="${item.quantity}">1</span> = 
+                                    ₹<span th:text="${item.totalPrice}">0</span>
+                                </li>
+                            </ul>
+                            <strong>Delivery Address:</strong> <span th:text="${order.deliveryAddress}">Address</span><br>
+                            <strong>Payment:</strong> <span th:text="${order.paymentMethod}">COD</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Details - SunKart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">🛒 SunKart</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products">Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/orders">My Orders</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <!-- Success Message -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>✅ Success!</strong> <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Error Message -->
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>❌ Error!</strong> <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <h2 class="mb-4">Order Details</h2>
+
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Order Info Card -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <span><strong>Order #<span th:text="${order.id}">1</span></strong></span>
+                        <span class="badge" 
+                              th:classappend="${order.status.name() == 'DELIVERED' ? 'bg-success' : 
+                                             order.status.name() == 'CANCELLED' ? 'bg-danger' : 
+                                             order.status.name() == 'SHIPPED' ? 'bg-info' : 
+                                             'bg-warning text-dark'}"
+                              th:text="${order.status}">Status</span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Order Date:</strong> <span th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy, hh:mm a')}">Date</span></p>
+                        <p><strong>Payment Method:</strong> <span th:text="${order.paymentMethod}">COD</span></p>
+                        <p><strong>Delivery Address:</strong><br><span th:text="${order.deliveryAddress}">Address</span></p>
+                        
+                        <!-- Order Status Timeline -->
+                        <div class="mt-4">
+                            <h6>Order Status Timeline:</h6>
+                            <div class="progress" style="height: 30px;">
+                                <div class="progress-bar" 
+                                     th:classappend="${order.status.name() == 'PENDING' ? 'bg-warning' : 
+                                                    order.status.name() == 'CONFIRMED' ? 'bg-info' : 
+                                                    order.status.name() == 'SHIPPED' ? 'bg-primary' : 
+                                                    order.status.name() == 'DELIVERED' ? 'bg-success' : 
+                                                    'bg-danger'}"
+                                     th:style="'width: ' + ${order.status.name() == 'PENDING' ? '25' : 
+                                                           order.status.name() == 'CONFIRMED' ? '50' : 
+                                                           order.status.name() == 'SHIPPED' ? '75' : 
+                                                           order.status.name() == 'DELIVERED' ? '100' : '100'} + '%'"
+                                     role="progressbar">
+                                    <span th:text="${order.status}">Status</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Order Items</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item : ${order.orderItems}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img th:src="${item.product.imageUrl}" 
+                                                 alt="Product" 
+                                                 style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;"
+                                                 onerror="this.src='https://via.placeholder.com/50'">
+                                            <span th:text="${item.product.name}">Product</span>
+                                        </div>
+                                    </td>
+                                    <td>₹<span th:text="${item.price}">0</span></td>
+                                    <td th:text="${item.quantity}">1</td>
+                                    <td class="fw-bold">₹<span th:text="${item.totalPrice}">0</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary & Actions -->
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Total Amount:</span>
+                            <strong class="text-success fs-4">₹<span th:text="${order.totalAmount}">0</span></strong>
+                        </div>
+                        <hr>
+                        <div class="alert" 
+                             th:classappend="${order.status.name() == 'CANCELLED' ? 'alert-danger' : 
+                                            order.status.name() == 'DELIVERED' ? 'alert-success' : 
+                                            'alert-info'}">
+                            <small>
+                                <strong>Status:</strong> <span th:text="${order.status}"></span><br>
+                                <span th:if="${order.status.name() == 'PENDING'}">⏳ Your order is being processed</span>
+                                <span th:if="${order.status.name() == 'CONFIRMED'}">✅ Your order has been confirmed</span>
+                                <span th:if="${order.status.name() == 'SHIPPED'}">🚚 Your order is on the way!</span>
+                                <span th:if="${order.status.name() == 'DELIVERED'}">🎉 Your order has been delivered</span>
+                                <span th:if="${order.status.name() == 'CANCELLED'}">❌ This order has been cancelled</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="card">
+                    <div class="card-body">
+                        <a href="/orders" class="btn btn-primary w-100 mb-2">
+                            ← Back to My Orders
+                        </a>
+                        <a href="/products" class="btn btn-outline-secondary w-100 mb-3">
+                            Continue Shopping
+                        </a>
+
+                        <!-- Cancel Order Button (only if not delivered or already cancelled) -->
+                        <div th:if="${order.status.name() != 'DELIVERED' && order.status.name() != 'CANCELLED'}">
+                            <hr>
+                            <form th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" 
+                                  onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    ❌ Cancel Order
+                                </button>
+                            </form>
+                            <small class="text-muted d-block mt-2 text-center">
+                                You can cancel this order until it's delivered
+                            </small>
+                        </div>
+
+                        <!-- Already Cancelled Message -->
+                        <div th:if="${order.status.name() == 'CANCELLED'}">
+                            <hr>
+                            <div class="alert alert-warning mb-0">
+                                <small>
+                                    <strong>Order Cancelled</strong><br>
+                                    This order has been cancelled and cannot be processed further.
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Already Delivered Message -->
+                        <div th:if="${order.status.name() == 'DELIVERED'}">
+                            <hr>
+                            <div class="alert alert-success mb-0">
+                                <small>
+                                    <strong>Order Delivered</strong><br>
+                                    This order has been successfully delivered. Thank you for shopping with us!
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
